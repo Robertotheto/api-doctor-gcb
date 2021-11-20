@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    entrypoint: dockerize -wait tcp://db:3307 -timeout 40s ./.docker/entrypoint.sh
+    container_name: nestjsDoctor
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/home/node/app
+    depends_on:
+      - db
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+
+  db:
+    build: .docker/mysql
+    restart: always
+    tty: true
+    container_name: db_doctor
+    volumes:
+      - ./.docker/dbdata:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=doctor
+      - MYSQL_ROOT_PASSWORD=root
