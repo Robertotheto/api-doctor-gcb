@@ -7,11 +7,14 @@ import {
   Param,
   Delete,
   HttpCode,
+  UsePipes,
 } from '@nestjs/common';
 import { DoctorsService } from './doctors.service';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
 import { Doctor } from './entities/doctor.entity';
+import { doctorSchema } from './schema/doctor.schema';
+import { YupValidationPipe } from './pipes/yupValidationPipe';
 
 @Controller('doctors')
 export class DoctorsController {
@@ -30,6 +33,7 @@ export class DoctorsController {
     return doctor;
   }
   @Post()
+  @UsePipes(new YupValidationPipe(doctorSchema))
   @HttpCode(201)
   async insert(@Body() createDoctorDto: CreateDoctorDto): Promise<Doctor> {
     const doctor = await this.doctorsService.insert(createDoctorDto);
