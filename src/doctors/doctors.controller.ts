@@ -8,6 +8,7 @@ import {
   Delete,
   HttpCode,
   UsePipes,
+  Query,
 } from '@nestjs/common';
 import { DoctorsService } from './doctors.service';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
@@ -15,6 +16,7 @@ import { UpdateDoctorDto } from './dto/update-doctor.dto';
 import { Doctor } from './entities/doctor.entity';
 import { doctorSchema } from './schema/doctor.schema';
 import { YupValidationPipe } from './pipes/yupValidationPipe';
+import { FindDoctorDTO } from './dto/find.doctor.dto';
 
 @Controller('doctors')
 export class DoctorsController {
@@ -24,6 +26,12 @@ export class DoctorsController {
   @HttpCode(200)
   selectAll(): Promise<Doctor[]> {
     return this.doctorsService.selectAll();
+  }
+  @Get('/search')
+  @HttpCode(200)
+  async findDoctors(@Query() queryDto: FindDoctorDTO): Promise<{ doctors: Doctor[]; }> {
+    const found = await this.doctorsService.findDoctors(queryDto);
+    return found;
   }
 
   @Get(':id')

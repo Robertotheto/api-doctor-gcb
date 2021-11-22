@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
+import { FindDoctorDTO } from './dto/find.doctor.dto';
 import { Doctor } from './entities/doctor.entity';
 import { Repository } from 'typeorm';
 import axios from 'axios';
@@ -62,5 +63,44 @@ export class DoctorsService {
       throw new NotFoundException(`This action update a ${id} doctor`);
     }
     return this.doctorRespository.remove(doctor);
+  }
+  async findDoctors({
+    name,
+    crm,
+    landline,
+    cellphone,
+    CEP,
+    medicalspecialties,
+  }: FindDoctorDTO): Promise<{ doctors: Doctor[] }> {
+    const builder = await this.doctorRespository.createQueryBuilder('doctors');
+    if (name) {
+      builder.where('doctors.name Like :name', { name: `%${name}%` });
+    }
+    if (crm) {
+      builder.where('doctors.crm Like :crm', { crm: `%${crm}%` });
+    }
+    if (landline) {
+      builder.where('doctors.landline Like :landline', {
+        landline: `%${landline}%`,
+      });
+    }
+    if (cellphone) {
+      builder.where('doctors.cellphone Like :cellphone', {
+        cellphone: `%${cellphone}%`,
+      });
+    }
+    if (CEP) {
+      builder.where('doctors.CEP Like :CEP', { CEP: `%${CEP}%` });
+    }
+
+    if (medicalspecialties) {
+      builder.where('doctors.medicalspecialties IN(medicalspecialties)');
+    }
+
+    const doctors = await builder.getMany();
+
+    return {
+      doctors,
+    };
   }
 }
