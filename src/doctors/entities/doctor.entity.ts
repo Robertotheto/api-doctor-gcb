@@ -5,7 +5,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Correios } from '../interfaces/interface.correios';
 import { v4 as uuid } from 'uuid';
 
 @Entity('doctors')
@@ -26,7 +25,7 @@ export class Doctor {
   cellphone: number;
 
   @Column('json')
-  CEP: Promise<Correios>;
+  CEP: number;
 
   @Column('json')
   medicalspecialties: string[];
@@ -37,7 +36,14 @@ export class Doctor {
   @UpdateDateColumn()
   update_at: Date;
 
-  constructor() {
+  constructor(doctor?: Partial<Doctor>) {
+    this.id = doctor?.id;
+    this.name = doctor?.name;
+    this.crm = doctor?.crm;
+    this.landline = doctor?.landline;
+    this.cellphone = doctor?.cellphone;
+    this.CEP = doctor?.CEP;
+    this.medicalspecialties = doctor?.medicalspecialties;
     if (!this.id) {
       this.id = uuid();
     }

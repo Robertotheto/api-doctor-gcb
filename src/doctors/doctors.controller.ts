@@ -17,6 +17,7 @@ import { Doctor } from './entities/doctor.entity';
 import { doctorSchema } from './schema/doctor.schema';
 import { YupValidationPipe } from './pipes/yupValidationPipe';
 import { FindDoctorDTO } from './dto/find.doctor.dto';
+import axios from "axios";
 
 @Controller('doctors')
 export class DoctorsController {
@@ -27,10 +28,11 @@ export class DoctorsController {
   selectAll(): Promise<Doctor[]> {
     return this.doctorsService.selectAll();
   }
+
   @Get('/search')
   @HttpCode(200)
-  async findDoctors(@Query() queryDto: FindDoctorDTO): Promise<{ doctors: Doctor[]; }> {
-    const found = await this.doctorsService.findDoctors(queryDto);
+  async findDoctors(@Query() queryDto: FindDoctorDTO): Promise<Doctor> {
+    const found = await this.doctorsService.search(queryDto);
     return found;
   }
 
@@ -44,7 +46,16 @@ export class DoctorsController {
   @UsePipes(new YupValidationPipe(doctorSchema))
   @HttpCode(201)
   async insert(@Body() createDoctorDto: CreateDoctorDto): Promise<Doctor> {
-    const doctor = await this.doctorsService.insert(createDoctorDto);
+    const {name,crm,landline,cellphone,cep,medicalspecialties} = createDoctorDto;
+    const CEP = (await axios.get(`https://viacep.com.br/ws/${cep}/json/`)).data;
+    const doctor = await this.doctorsService.insert({
+      name,
+      crm,
+      landline,
+      cellphone,
+      cep: CEP,
+      medicalspecialties
+    });
     return doctor;
   }
 
@@ -59,7 +70,7 @@ export class DoctorsController {
 
   @Delete(':id')
   @HttpCode(204)
-  softDelete(@Param('id') id: string): Promise<Doctor> {
-    return this.doctorsService.softDelete(id);
+  async softDelete(@Param('id') id: string): Promise<void> {
+   await this.doctorsService.softDelete(id);
   }
 }

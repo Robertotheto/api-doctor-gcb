@@ -5,74 +5,54 @@ import { UpdateDoctorDto } from './dto/update-doctor.dto';
 import { FindDoctorDTO } from './dto/find.doctor.dto';
 import { Doctor } from './entities/doctor.entity';
 import { Repository } from 'typeorm';
-import axios from 'axios';
+
 
 @Injectable()
 export class DoctorsService {
   constructor(
     @InjectRepository(Doctor)
-    private readonly doctorRespository: Repository<Doctor>,
-  ) {}
-  async insert({
-    name,
-    crm,
-    cep,
-    landline,
-    cellphone,
-    medicalspecialties,
-  }: CreateDoctorDto): Promise<Doctor> {
-    const doctor = this.doctorRespository.create();
-    doctor.name = name;
-    doctor.crm = crm;
-    doctor.landline = landline;
-    doctor.cellphone = cellphone;
-    doctor.CEP = (
-      await axios.get(`https://viacep.com.br/ws/${cep}/json/`)
-    ).data;
-    doctor.medicalspecialties = medicalspecialties;
-
-    return this.doctorRespository.save(doctor);
+    private readonly doctorRepository: Repository<Doctor>,
+  ) { }
+  async insert(createDoctorDTO: CreateDoctorDto): Promise<Doctor> {
+    this.doctorRepository.create(createDoctorDTO);
+    return this.doctorRepository.save(createDoctorDTO);
   }
 
   selectAll(): Promise<Doctor[]> {
-    return this.doctorRespository.find();
+    return this.doctorRepository.find();
   }
 
   async select(id: string): Promise<Doctor> {
-    const doctor = await this.doctorRespository.findOne(id);
-    if (!doctor) {
-      throw new NotFoundException(`This action select a ${id} doctor`);
+    try {
+      const doctor = await this.doctorRepository.findOneOrFail(id);
+      return doctor;
+    } catch (error) {
+      throw new NotFoundException(error.message);
     }
-    return doctor;
   }
 
   async update(id: string, updateDoctorDto: UpdateDoctorDto): Promise<Doctor> {
-    const doctor = await this.doctorRespository.preload({
-      id: String(id),
-      ...updateDoctorDto,
-    });
-    if (!doctor) {
-      throw new NotFoundException(`This action update a ${id} doctor`);
+    try {
+      const doctor = await this.doctorRepository.findOneOrFail(id);
+      this.doctorRepository.merge(doctor, updateDoctorDto);
+      return this.doctorRepository.save(doctor);
+    } catch (error) {
+      throw new NotFoundException(error.message);
     }
-    return this.doctorRespository.save(doctor);
   }
 
-  async softDelete(id: string): Promise<Doctor> {
-    const doctor = await this.doctorRespository.findOne(id);
-    if (!doctor) {
-      throw new NotFoundException(`This action update a ${id} doctor`);
+  async softDelete(id: string): Promise<void> {
+    try {
+      const doctor = await this.doctorRepository.findOneOrFail(id);
+      await this.doctorRepository.remove(doctor);
+    }catch (error) {
+      throw new NotFoundException(error.message);
     }
-    return this.doctorRespository.remove(doctor);
   }
-  async findDoctors({
-    name,
-    crm,
-    landline,
-    cellphone,
-    CEP,
-    medicalspecialties,
-  }: FindDoctorDTO): Promise<{ doctors: Doctor[] }> {
-    const builder = await this.doctorRespository.createQueryBuilder('doctors');
+
+  async search(findDoctorDTO: FindDoctorDTO): Promise<Doctor>{
+    const {name,crm,landline,cellphone,CEP,medicalspecialties} = findDoctorDTO;
+    const builder = await this.doctorRepository.createQueryBuilder('doctors');
     if (name) {
       builder.where('doctors.name Like :name', { name: `%${name}%` });
     }
@@ -90,17 +70,18 @@ export class DoctorsService {
       });
     }
     if (CEP) {
-      builder.where('doctors.CEP Like :CEP', { CEP: `%${CEP}%` });
+      builder.where('doctors.CEP LIKE :CEP', { CEP: `%${CEP}%` });
     }
-
     if (medicalspecialties) {
-      builder.where('doctors.medicalspecialties IN(medicalspecialties)');
+      builder.where('doctors.medicalspecialties IN(medicalspecialties)', [
+        medicalspecialties,
+      ]);
     }
 
-    const doctors = await builder.getMany();
+    const [doctor] = await builder.getMany();
 
-    return {
-      doctors,
-    };
+    return doctor;
+
   }
+
 }
