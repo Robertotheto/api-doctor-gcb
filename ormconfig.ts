@@ -1,8 +1,8 @@
 module.exports = [
   {
     type: 'mysql',
-    host: 'localhost',
-    port: 3307,
+    host: 'db',
+    port: 3306,
     username: 'root',
     password: 'root',
     database: 'doctor',
@@ -13,9 +13,6 @@ module.exports = [
       migrationsDir: './src/doctors/migrations',
     },
     migrationsTableName: 'migrations_history',
-    synchronize: true,
-    autoLoadEntities: true,
     migrationsRun: true,
-    logging: true,
   },
 ];

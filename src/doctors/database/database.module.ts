@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DatabaseConnections } from './database.connection';
+import { DatabaseProvider } from './database.provider';
 
 @Module({
-  imports: [...DatabaseConnections],
+  imports: [...DatabaseProvider],
   exports: [TypeOrmModule],
 })
 export class DatabaseModule { }
