@@ -5,6 +5,7 @@ import { UpdateDoctorDto } from './dto/update-doctor.dto';
 import { FindDoctorDTO } from './dto/find.doctor.dto';
 import { Doctor } from './entities/doctor.entity';
 import { Repository } from 'typeorm';
+import { HttpService } from "@nestjs/axios";
 
 
 @Injectable()
@@ -12,10 +13,18 @@ export class DoctorsService {
   constructor(
     @InjectRepository(Doctor)
     private readonly doctorRepository: Repository<Doctor>,
+    private readonly httpService: HttpService,
   ) { }
   async insert(createDoctorDTO: CreateDoctorDto): Promise<Doctor> {
-    this.doctorRepository.create(createDoctorDTO);
-    return this.doctorRepository.save(createDoctorDTO);
+    const address = await this.CepCorreios(createDoctorDTO.cep);
+    const doctor = this.doctorRepository.create(createDoctorDTO);
+    doctor.name = createDoctorDTO.name;
+    doctor.crm = createDoctorDTO.crm;
+    doctor.landline = createDoctorDTO.landline;
+    doctor.cellphone = createDoctorDTO.cellphone;
+    doctor.CEP = address;
+    doctor.medicalspecialties = createDoctorDTO.medicalspecialties;
+    return this.doctorRepository.save(doctor);
   }
 
   selectAll(): Promise<Doctor[]> {
@@ -34,6 +43,9 @@ export class DoctorsService {
   async update(id: string, updateDoctorDto: UpdateDoctorDto): Promise<Doctor> {
     try {
       const doctor = await this.doctorRepository.findOneOrFail(id);
+      if (updateDoctorDto.cep){
+        return  await this.CepCorreios(updateDoctorDto.cep);
+      }
       this.doctorRepository.merge(doctor, updateDoctorDto);
       return this.doctorRepository.save(doctor);
     } catch (error) {
@@ -44,7 +56,16 @@ export class DoctorsService {
   async softDelete(id: string): Promise<void> {
     try {
       const doctor = await this.doctorRepository.findOneOrFail(id);
-      await this.doctorRepository.remove(doctor);
+      await this.doctorRepository.softDelete(doctor);
+    }catch (error) {
+      throw new NotFoundException(error.message);
+    }
+  }
+  async restore(id: string): Promise<Doctor>{
+    try {
+      await this.restore(id);
+      const doctor = await this.doctorRepository.findOneOrFail(id);
+      return doctor;
     }catch (error) {
       throw new NotFoundException(error.message);
     }
@@ -82,6 +103,12 @@ export class DoctorsService {
 
     return doctor;
 
+  }
+  private async CepCorreios(cep: number){
+    const {status,data} = await this.httpService.get(`https://viacep.com.br/ws/${cep}/json/`).toPromise()
+    if (status === 200){
+      return data;
+    }
   }
 
 }

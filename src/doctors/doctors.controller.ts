@@ -8,8 +8,8 @@ import {
   Delete,
   HttpCode,
   UsePipes,
-  Query,
-} from '@nestjs/common';
+  Query, HttpStatus
+} from "@nestjs/common";
 import { DoctorsService } from './doctors.service';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
@@ -24,53 +24,48 @@ export class DoctorsController {
   constructor(private readonly doctorsService: DoctorsService) {}
 
   @Get()
-  @HttpCode(200)
-  selectAll(): Promise<Doctor[]> {
-    return this.doctorsService.selectAll();
+  @HttpCode(HttpStatus.OK)
+  async selectAll(): Promise<Doctor[]> {
+    return await this.doctorsService.selectAll();
   }
 
   @Get('/search')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   async findDoctors(@Query() queryDto: FindDoctorDTO): Promise<Doctor> {
     const found = await this.doctorsService.search(queryDto);
     return found;
   }
 
   @Get(':id')
-  @HttpCode(200)
-  select(@Param('id') id: string): Promise<Doctor> {
-    const doctor = this.doctorsService.select(id);
+  @HttpCode(HttpStatus.OK)
+  async select(@Param('id') id: string): Promise<Doctor> {
+    const doctor = await this.doctorsService.select(id);
     return doctor;
   }
   @Post()
   @UsePipes(new YupValidationPipe(doctorSchema))
-  @HttpCode(201)
+  @HttpCode(HttpStatus.CREATED)
   async insert(@Body() createDoctorDto: CreateDoctorDto): Promise<Doctor> {
-    const {name,crm,landline,cellphone,cep,medicalspecialties} = createDoctorDto;
-    const CEP = (await axios.get(`https://viacep.com.br/ws/${cep}/json/`)).data;
-    const doctor = await this.doctorsService.insert({
-      name,
-      crm,
-      landline,
-      cellphone,
-      cep: CEP,
-      medicalspecialties
-    });
-    return doctor;
+     return await this.doctorsService.insert(createDoctorDto);
   }
 
   @Patch(':id')
-  @HttpCode(200)
-  update(
+  @HttpCode(HttpStatus.OK)
+  async update(
     @Param('id') id: string,
     @Body() updateDoctorDto: UpdateDoctorDto,
   ): Promise<Doctor> {
-    return this.doctorsService.update(id, updateDoctorDto);
+    return await this.doctorsService.update(id, updateDoctorDto);
   }
 
   @Delete(':id')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async softDelete(@Param('id') id: string): Promise<void> {
    await this.doctorsService.softDelete(id);
+  }
+  @Post('/restore/:id')
+  @HttpCode(HttpStatus.OK)
+  async restore(@Param('id') id: string): Promise<Doctor> {
+    return await this.doctorsService.restore(id);
   }
 }

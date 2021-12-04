@@ -1,10 +1,10 @@
 import {
   Column,
-  CreateDateColumn,
+  CreateDateColumn, DeleteDateColumn,
   Entity,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+  UpdateDateColumn
+} from "typeorm";
 import { v4 as uuid } from 'uuid';
 
 @Entity('doctors')
@@ -35,6 +35,9 @@ export class Doctor {
 
   @UpdateDateColumn()
   update_at: Date;
+
+  @DeleteDateColumn()
+  delete_at: Date;
 
   constructor(doctor?: Partial<Doctor>) {
     this.id = doctor?.id;
