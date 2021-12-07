@@ -15,7 +15,7 @@ export class UpdateDoctorDto  {
   readonly cellphone?: number;
 
   @ApiPropertyOptional()
-  readonly cep?: number;
+  CEP?: number;
 
   @ApiPropertyOptional()
   readonly medicalspecialties?: string[];

@@ -15,7 +15,7 @@ export const doctorSchema = yup.object().shape({
     ),
   landline: yup.number().required('The landline required field'),
   cellphone: yup.number().required('The required cell phone field'),
-  cep: yup
+  CEP: yup
     .number()
     .required('The cep field is required')
     .test(

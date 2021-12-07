@@ -21,6 +21,7 @@ import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { DoctorSwagger } from "./swagger/doctor.swagger";
 import { BadRequestSwagger } from "./utils/swagger/BadRequestSwagger";
 import { NotFoundSwagger } from "./utils/swagger/NotFoundSwagger";
+import axios from "axios";
 
 @Controller('/api/v1/doctors')
 @ApiTags('doctors')
@@ -60,7 +61,17 @@ export class DoctorsController {
   @UsePipes(new YupValidationPipe(doctorSchema))
   @HttpCode(HttpStatus.CREATED)
   async insert(@Body() createDoctorDto: CreateDoctorDto): Promise<Doctor> {
-     return await this.doctorsService.insert(createDoctorDto);
+    const doctor = await this.doctorsService.insert({
+      name: createDoctorDto.name,
+      crm: createDoctorDto.crm,
+      landline: createDoctorDto.landline,
+      cellphone: createDoctorDto.cellphone,
+      CEP: (
+        await axios.get(`https://viacep.com.br/ws/${createDoctorDto.CEP}/json/`)
+      ).data,
+      medicalspecialties: createDoctorDto.medicalspecialties,
+    })
+     return doctor;
   }
 
   @Patch(':id')
@@ -73,6 +84,12 @@ export class DoctorsController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateDoctorDto: UpdateDoctorDto,
   ): Promise<Doctor> {
+    if (updateDoctorDto.CEP){
+      updateDoctorDto.CEP = (
+        await axios.get(`https://viacep.com.br/ws/${updateDoctorDto.CEP}/json/`)
+      ).data
+    }
+
     return await this.doctorsService.update(id, updateDoctorDto);
   }
 

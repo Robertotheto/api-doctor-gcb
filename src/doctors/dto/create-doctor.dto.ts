@@ -14,7 +14,7 @@ export class CreateDoctorDto {
   readonly cellphone: number;
 
   @ApiProperty()
-  readonly cep: number;
+  readonly CEP: number;
 
   @ApiProperty()
   readonly medicalspecialties: string[];
