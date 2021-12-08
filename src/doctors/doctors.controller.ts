@@ -7,20 +7,17 @@ import {
   Param,
   Delete,
   HttpCode,
-  UsePipes,
-  Query, HttpStatus, ParseUUIDPipe
+  Query, HttpStatus, ParseUUIDPipe, ValidationPipe
 } from "@nestjs/common";
 import { DoctorsService } from './doctors.service';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
 import { Doctor } from './entities/doctor.entity';
-import { doctorSchema } from './schema/doctor.schema';
-import { YupValidationPipe } from './pipes/yupValidationPipe';
 import { FindDoctorDTO } from './dto/find.doctor.dto';
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { DoctorSwagger } from "./swagger/doctor.swagger";
-import { BadRequestSwagger } from "./utils/swagger/BadRequestSwagger";
-import { NotFoundSwagger } from "./utils/swagger/NotFoundSwagger";
+import { BadRequestSwagger } from "./helper/swagger/BadRequestSwagger";
+import { NotFoundSwagger } from "./helper/swagger/NotFoundSwagger";
 import axios from "axios";
 
 @Controller('/api/v1/doctors')
@@ -58,9 +55,8 @@ export class DoctorsController {
   @ApiOperation({summary: 'Creat one doctor'})
   @ApiResponse({status: 201, description: 'Creat one doctor, returned successfully',type: DoctorSwagger})
   @ApiResponse({status: 400, description: 'invalid parameters', type: BadRequestSwagger})
-  @UsePipes(new YupValidationPipe(doctorSchema))
   @HttpCode(HttpStatus.CREATED)
-  async insert(@Body() createDoctorDto: CreateDoctorDto): Promise<Doctor> {
+  async insert(@Body(new ValidationPipe(({forbidNonWhitelisted: true,whitelist: true, transform: true}))) createDoctorDto: CreateDoctorDto): Promise<Doctor> {
     const doctor = await this.doctorsService.insert({
       name: createDoctorDto.name,
       crm: createDoctorDto.crm,
@@ -82,7 +78,7 @@ export class DoctorsController {
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() updateDoctorDto: UpdateDoctorDto,
+    @Body(new ValidationPipe(({forbidNonWhitelisted: true,whitelist: true, transform: true}))) updateDoctorDto: UpdateDoctorDto,
   ): Promise<Doctor> {
     if (updateDoctorDto.CEP){
       updateDoctorDto.CEP = (
