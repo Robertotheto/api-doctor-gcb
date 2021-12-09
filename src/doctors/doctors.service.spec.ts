@@ -43,7 +43,8 @@ describe('DoctorsService', () => {
             save: jest.fn().mockResolvedValue(doctorEntity[0]),
             findOneOrFail: jest.fn().mockResolvedValue(doctorEntity[0]),
             merge: jest.fn().mockResolvedValue(updateDoctorEntity),
-            remove: jest.fn().mockResolvedValue(undefined),
+            softDelete: jest.fn().mockResolvedValue(undefined),
+            restore: jest.fn().mockResolvedValue(doctorEntity[0]),
           },
         },
       ],
@@ -94,7 +95,7 @@ describe('DoctorsService', () => {
         crm: 1234567,
         landline: 66999990000,
         cellphone: 66999991122,
-        cep: 78550434,
+        CEP: 78550434,
         medicalspecialties: ['Cardiologia', 'NeuroCirurgião'],
       };
       const result = await doctorService.insert(data);
@@ -108,7 +109,7 @@ describe('DoctorsService', () => {
         crm: 1234567,
         landline: 66999990000,
         cellphone: 66999991122,
-        cep: 78550434,
+        CEP: 78550434,
         medicalspecialties: ['Cardiologia', 'NeuroCirurgião'],
       };
       jest.spyOn(doctorRepository, 'save').mockRejectedValueOnce(new Error());
@@ -148,16 +149,23 @@ describe('DoctorsService', () => {
     it("should delete one doctor", async ()  => {
       const result = await doctorService.softDelete('49adedf0-0f94-4f5f-b05a-6fff7084275c');
       expect(result).toBeUndefined();
-      expect(doctorRepository.findOneOrFail).toHaveBeenCalledTimes(1);
-      expect(doctorRepository.remove).toHaveBeenCalledTimes(1);
+      expect(doctorRepository.softDelete).toHaveBeenCalledTimes(1);
     });
     it("should throw an excepetion", function() {
-      jest.spyOn(doctorRepository,'findOneOrFail').mockRejectedValueOnce(new Error());
+      jest.spyOn(doctorRepository,'softDelete').mockRejectedValueOnce(new Error());
       expect(doctorService.softDelete('49adedf0-0f94-4f5f-b05a-6fff7084275c')).rejects.toThrowError(NotFoundException);
     });
+  })
+  describe('Restore', () => {
+    it("should restore one doctor", async () => {
+      const result = await doctorService.restore('49adedf0-0f94-4f5f-b05a-6fff7084275c');
+      expect(result).toEqual(doctorEntity[0]);
+      expect(doctorRepository.restore).toHaveBeenCalledTimes(1);
+      expect(doctorRepository.findOneOrFail).toHaveBeenCalledTimes(1);
+    });
     it("should throw an excepetion", function() {
-      jest.spyOn(doctorRepository,'remove').mockRejectedValueOnce(new Error());
-      expect(doctorService.softDelete('49adedf0-0f94-4f5f-b05a-6fff7084275c')).rejects.toThrowError();
+      jest.spyOn(doctorRepository,'restore').mockRejectedValueOnce(new Error());
+      expect(doctorService.restore('49adedf0-0f94-4f5f-b05a-6fff7084275c')).rejects.toThrowError(NotFoundException);
     });
   })
 });

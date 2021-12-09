@@ -16,7 +16,16 @@ export class DoctorsService {
 
   ) { }
   async insert(createDoctorDto : CreateDoctorDto): Promise<Doctor> {
-    const doctor = this.doctorRepository.create(createDoctorDto);
+    const doctor = this.doctorRepository.create({
+      name: createDoctorDto.name,
+      crm: createDoctorDto.crm,
+      landline: createDoctorDto.landline,
+      cellphone: createDoctorDto.cellphone,
+      CEP: (
+        await axios.get(`https://viacep.com.br/ws/${createDoctorDto.CEP}/json/`)
+      ).data,
+      medicalspecialties: createDoctorDto.medicalspecialties,
+    });
     return await this.doctorRepository.save(doctor);
   }
 
@@ -36,6 +45,11 @@ export class DoctorsService {
   async update(id: string, updateDoctorDto: UpdateDoctorDto): Promise<Doctor> {
     try {
       const doctor = await this.doctorRepository.findOneOrFail(id);
+      if (updateDoctorDto.CEP){
+        updateDoctorDto.CEP = (
+          await axios.get(`https://viacep.com.br/ws/${updateDoctorDto.CEP}/json/`)
+        ).data
+      }
       this.doctorRepository.merge(doctor, updateDoctorDto);
       return this.doctorRepository.save(doctor);
     } catch (error) {

@@ -40,6 +40,7 @@ describe('DoctorsController', () => {
           insert: jest.fn().mockResolvedValue(doctorEntity[0]),
           update: jest.fn().mockResolvedValue(updateDoctorEntity),
           softDelete: jest.fn().mockResolvedValue(undefined),
+          restore: jest.fn().mockResolvedValue(doctorEntity[0]),
         }
       }],
     }).compile();
@@ -70,7 +71,7 @@ describe('DoctorsController', () => {
         crm: 1234567,
         landline: 66999990000,
         cellphone: 66999991122,
-        cep: 78550434,
+        CEP: 78550434,
         medicalspecialties: ['Cardiologia', 'NeuroCirurgião'],
       };
       const result = await doctorController.insert(data);
@@ -85,7 +86,7 @@ describe('DoctorsController', () => {
         crm: 1234567,
         landline: 66999990000,
         cellphone: 66999991122,
-        cep: 78550434,
+        CEP: 78550434,
         medicalspecialties: ['Cardiologia', 'NeuroCirurgião'],
       };
       expect(doctorController.insert(data)).rejects.toThrowError();
@@ -131,6 +132,17 @@ describe('DoctorsController', () => {
     it("should throw an exception", function() {
       jest.spyOn(doctorService, 'softDelete').mockRejectedValueOnce(new Error());
       expect(doctorController.softDelete('49adedf0-0f94-4f5f-b05a-6fff7084275c')).rejects.toThrowError();
+    });
+  })
+  describe('Restore', () => {
+    it("should restore one doctpr", async () => {
+      const result = await doctorController.restore('49adedf0-0f94-4f5f-b05a-6fff7084275c');
+      expect(result).toEqual(doctorEntity[0]);
+      expect(doctorService.restore).toHaveBeenCalledTimes(1);
+    });
+    it("should throw an exception", function() {
+      jest.spyOn(doctorService, 'restore').mockRejectedValueOnce(new Error());
+      expect(doctorController.restore('49adedf0-0f94-4f5f-b05a-6fff7084275c')).rejects.toThrowError();
     });
   })
 });

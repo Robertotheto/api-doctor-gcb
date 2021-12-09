@@ -57,17 +57,8 @@ export class DoctorsController {
   @ApiResponse({status: 400, description: 'invalid parameters', type: BadRequestSwagger})
   @HttpCode(HttpStatus.CREATED)
   async insert(@Body(new ValidationPipe(({forbidNonWhitelisted: true,whitelist: true, transform: true}))) createDoctorDto: CreateDoctorDto): Promise<Doctor> {
-    const doctor = await this.doctorsService.insert({
-      name: createDoctorDto.name,
-      crm: createDoctorDto.crm,
-      landline: createDoctorDto.landline,
-      cellphone: createDoctorDto.cellphone,
-      CEP: (
-        await axios.get(`https://viacep.com.br/ws/${createDoctorDto.CEP}/json/`)
-      ).data,
-      medicalspecialties: createDoctorDto.medicalspecialties,
-    })
-     return doctor;
+    const doctor = await this.doctorsService.insert(createDoctorDto)
+    return doctor;
   }
 
   @Patch(':id')
@@ -80,12 +71,6 @@ export class DoctorsController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body(new ValidationPipe(({forbidNonWhitelisted: true,whitelist: true, transform: true}))) updateDoctorDto: UpdateDoctorDto,
   ): Promise<Doctor> {
-    if (updateDoctorDto.CEP){
-      updateDoctorDto.CEP = (
-        await axios.get(`https://viacep.com.br/ws/${updateDoctorDto.CEP}/json/`)
-      ).data
-    }
-
     return await this.doctorsService.update(id, updateDoctorDto);
   }
 
