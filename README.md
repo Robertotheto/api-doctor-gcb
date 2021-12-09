@@ -23,50 +23,78 @@
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 ## Description
+<p>Para darmos continuidade em seu processo seletivo, pedimos que você realize o seguinte teste:<p>
+<p>Desenvolver um sistema que faça a gestão de cadastros de médicos. O Sistema deve suportar as seguintes operações:<p>
+<ul>
+    <li>Insert</li>
+    <li>Update</li>
+    <li>Select</li>
+    <li>Soft Delete</li>
+</ul>
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Uses Cases
+<p>No cadastro do médico, devem ser cadastrados os seguintes itens:
+</p>
+<ul>
+    <li>Nome do médico com no máximo 120 caractéres</li>
+    <li>CRM: somente números com no máximo 7 caracteres</li>
+    <li>Telefone fixo: somente números</li>
+    <li>Telefone celular: somente números</li>
+    <li>CEP: somente números (Ao cadastrar o CEP, deve ser feita uma reqisição via XHR para a API dos correios e retornar todos os dados de endereço do cliente).</li>
+    <li>Especialidade médica (mínimo de duas especialidades)</li>
+</ul>
+
+## Important Items
+<ul>
+    <li>Estar no padrão REST</li>
+    <li>Criar mecanismo de busca por todos os campos do cadastro do médico, incluindo o endereço</li>
+    <li>Utilizar ferramenta de validação (exemplo: YUP)</li>
+    <li>Funções especialistas (Realizam somente uma operação)</li>
+    <li>Para documentação e requisição utilizar o Postman, Insomnia ou Swagger (Enviar junto com o teste o workspace utilizado)</li>
+    <li>Subir o código em repositório público do GitHub</li>
+    <li>Criar arquivo docker compose para avaliação do teste (ATENÇÃO: Sem esse arquivo seu teste não será executado)</li>
+    <li>Testes unitários</li>
+    <li>Testes "end to end"</li>
+</ul>
+
+## Migrations & Seeds
+<p>No banco de dados devem estar cadastradas as seguintes especialidades:</p>
+<ul>
+    <li>Alergologia</li>
+    <li>Angiologia</li>
+    <li>Buco maxilo</li>
+    <li>Cardiologia clínca</li>
+    <li>Cardiologia infantil</li>
+    <li>Cirurgia cabeça e pescoço</li>
+    <li>Cirurgia cardíaca</li>
+    <li>Cirurgia de tórax</li>
+</ul>
 
 ## Installation
 
 ```bash
-$ npm install
+$ docker-compose up --build
 ```
 
 ## Running the app
 
 ```bash
 # development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+$ docker-compose up --build
 ```
 
 ## Test
 
 ```bash
 # unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+$ docker exec -it image_container /bin/bash
+$ yarn test
 ```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
 ## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- Author - Roberto dos Santos Filho
+- Website - [https://github.com/robertotheto](https://github.com/robertotheto)
 
 ## License
 
