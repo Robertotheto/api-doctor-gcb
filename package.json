@@ -1,10 +1,10 @@
 {
   "name": "api-doctor",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "description": "Desenvolver um sistema que faça a gestão de cadastros de médicos.",
+  "author": "Roberto Filho",
+  "private": false,
+  "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
@@ -40,8 +40,7 @@
     "rxjs": "^7",
     "swagger-ui-express": "^4.2.0",
     "typeorm": "^0.2.41",
-    "uuid": "^8.3.2",
-    "yup": "^0.32.11"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.6.0",
@@ -52,7 +51,6 @@
     "@types/node": "^14.14.36",
     "@types/supertest": "^2.0.10",
     "@types/uuid": "^8.3.3",
-    "@types/yup": "^0.29.13",
     "@typescript-eslint/eslint-plugin": "^4.19.0",
     "@typescript-eslint/parser": "^4.19.0",
     "eslint": "^7.22.0",

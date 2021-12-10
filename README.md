@@ -73,7 +73,8 @@
 ## Installation
 
 ```bash
-$ docker-compose up --build
+$ git clone https://github.com/Robertotheto/api-doctor-gcb.git
+$ cd api-doctor-gcb
 ```
 
 ## Running the app
@@ -82,12 +83,49 @@ $ docker-compose up --build
 # development
 $ docker-compose up --build
 ```
+## Resources
+
+## List all doctors
+```bash
+# Select All
+GET(http://localhost:3000/api/v1/doctors)
+```
+## List doctor
+```bash
+# Select
+GET(http://localhost:3000/api/v1/doctors/:id)
+```
+## List search doctor
+```bash
+# Search
+GET(http://localhost:3000/api/v1/doctors/search?name=Ben)
+```
+## Create doctor
+```bash
+# Insert
+POST(http://localhost:3000/api/v1/doctors)
+```
+## Update doctor
+```bash
+# Update
+PATCH(http://localhost:3000/api/v1/doctors/:id)
+```
+## Delete doctor
+```bash
+# Soft Delete
+DELETE(http://localhost:3000/api/v1/doctors/:id)
+```
+## Restore doctor
+```bash
+# Restore
+POST(http://localhost:3000/api/v1/doctors/restore/:id)
+```
 
 ## Test
 
 ```bash
 # unit tests
-$ docker exec -it image_container /bin/bash
+$ docker exec -it nestjs_doctor /bin/bash
 $ yarn test
 ```
 
